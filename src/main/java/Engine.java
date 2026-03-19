@@ -5,6 +5,24 @@ public class Engine {
 
     public static Scene scene;
 
+    public static void init() {
+        scene = new Scene();
+        Mesh mesh = new Mesh( new float[] {
+                0.5f, 0.5f, 0.0f,   0.0f, 1.0f, 1.0f,   1.0f, 1.0f,
+                0.5f, -0.5f, 0.0f,  1.0f, 1.0f, 0.0f,   1.0f, 0.0f,
+                -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f,   0.0f, 0.0f,
+                -0.5f, 0.5f, 0.0f,  1.0f, 1.0f, 1.0f,   0.0f, 1.0f
+        }, "test" ,GL_FILL );
+        Mesh mesh2 = new Mesh( new float[] {
+                1f, 1f, 0.0f,   0.0f, 1.0f, 1.0f,   1.0f, 1.0f,
+                1f, -1f, 0.0f,  1.0f, 1.0f, 0.0f,   1.0f, 0.0f,
+                -1f, -1f, 0.0f, 1.0f, 0.0f, 1.0f,   0.0f, 0.0f,
+                -1f, 1f, 0.0f,  1.0f, 1.0f, 1.0f,   0.0f, 1.0f
+        }, "test2" ,GL_FILL );
+        //scene.add( mesh2 );
+        scene.add( mesh );
+    }
+
     public static void run( Window win ) {
         init();
 
@@ -26,16 +44,6 @@ public class Engine {
                 lastTime = currentTime;
             }
         }
-    }
-
-    public static void init() {
-        scene = new Scene();
-        Mesh mesh = new Mesh( new float[] {
-                0.5f, 0.5f, 0.0f,   0.0f, 1.0f, 1.0f,   1.0f, 1.0f,
-                0.5f, -0.5f, 0.0f,  1.0f, 1.0f, 0.0f,   1.0f, 0.0f,
-                -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f,   0.0f, 0.0f,
-                -0.5f, 0.5f, 0.0f,  1.0f, 1.0f, 1.0f,   0.0f, 1.0f
-        }, "test" ,GL_FILL );
-        scene.add( mesh );
+        glfwTerminate();
     }
 }

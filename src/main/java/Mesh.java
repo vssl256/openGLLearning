@@ -9,6 +9,7 @@ public class Mesh {
 
     private Shader shader;
     private Texture texture;
+    private Texture texture2;
 
     public float[] vertices;
     public FloatBuffer verticesBuffer;
@@ -27,7 +28,8 @@ public class Mesh {
         this.vertices = vertices;
         this.drawMode = drawMode;
         shader = new Shader( name );
-        texture = new Texture( name );
+        texture2 = new Texture( name );
+        texture = new Texture( "test2" );
         verticesBuffer = MemoryUtil.memCallocFloat( vertices.length );
         verticesBuffer.put( 0, vertices );
         init();
@@ -60,6 +62,7 @@ public class Mesh {
     public void draw() {
         glPolygonMode( GL_FRONT_AND_BACK, drawMode );
 
+        shader.needToRecompile();
         glUseProgram( shader.shaderProgram );
 
         int vertexColorLocation = glGetUniformLocation( shader.shaderProgram, "u_Color" );
@@ -67,8 +70,11 @@ public class Mesh {
         float colorValue = ( float )( ( Math.sin( time ) / 2.0f ) + 0.5f );
         glUniform3f( vertexColorLocation, colorValue, colorValue, colorValue );
 
-        //glActiveTexture( GL_TEXTURE0 );
+        glActiveTexture( GL_TEXTURE0 );
         glBindTexture( GL_TEXTURE_2D, texture.id );
+
+        glActiveTexture( GL_TEXTURE1 );
+        glBindTexture( GL_TEXTURE_2D, texture2.id );
 
         glBindVertexArray( VAO );
         glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );
