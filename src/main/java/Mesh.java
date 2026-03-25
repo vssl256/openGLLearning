@@ -1,15 +1,20 @@
+import org.joml.Math;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
 import static org.lwjgl.opengl.GL33.*;
 
 public class Mesh {
 
-    private Shader shader;
-    private Texture texture;
-    private Texture texture2;
+    private Shader shaderProgram;
+    private List<Texture> textures;
 
     public float[] vertices;
     public FloatBuffer verticesBuffer;
@@ -24,15 +29,49 @@ public class Mesh {
             1, 2, 3
     };
 
-    public Mesh( float[] vertices, String name, int drawMode ) {
+    public Mesh( float[] vertices, String name, int drawMode, Shader shaderProgram ) {
         this.vertices = vertices;
         this.drawMode = drawMode;
-        shader = new Shader( name );
-        texture2 = new Texture( name );
-        texture = new Texture( "test2" );
+        this.shaderProgram = shaderProgram;
+        initTextures( name );
+
         verticesBuffer = MemoryUtil.memCallocFloat( vertices.length );
         verticesBuffer.put( 0, vertices );
         init();
+    }
+
+    private void initTextures( String name ) {
+        textures = new ArrayList<>();
+        textures.add( new Texture( name ) );
+        textures.add( new Texture( name ) );
+        textures.add( new Texture( name ) );
+    }
+
+    private void setUniforms() {
+        for ( int i = 0; i < textures.size(); i++ ) {
+            shaderProgram.createUniform( "texture" + i );
+            shaderProgram.setUniform1i( "texture" + i, i );
+        }
+    }
+
+    public static int width = 480;
+    public static int height = 480;
+    public static float rotX = 0f;
+    public static float rotY = 0f;
+    public static float xOffset = 0f;
+    public static float zOffset = 0f;
+    public void matrixTest() {
+        try ( MemoryStack stack = MemoryStack.stackPush() ) {
+
+            Matrix4f matrix = new Matrix4f()
+                    .setPerspective( Math.toRadians( 90f ),
+                            ( float ) width / height, 0.01f, 1000.0f )
+                    .rotateX( Math.toRadians( rotY ) )
+                    .rotateY( Math.toRadians( rotX ) )
+                    .translate( new Vector3f( xOffset, 0.0f, zOffset ).rotateY( Math.toRadians(rotX) ) );
+
+            glUniformMatrix4fv( glGetUniformLocation( shaderProgram.id, "projection" ), false, matrix.get( stack.mallocFloat( 16 ) ) );
+        }
     }
 
     public void init() {
@@ -60,21 +99,21 @@ public class Mesh {
     }
 
     public void draw() {
-        glPolygonMode( GL_FRONT_AND_BACK, drawMode );
+        //glPolygonMode( GL_FRONT_AND_BACK, drawMode );
 
-        shader.needToRecompile();
-        glUseProgram( shader.shaderProgram );
+        shaderProgram.needToRecompile();
 
-        int vertexColorLocation = glGetUniformLocation( shader.shaderProgram, "u_Color" );
+        glUseProgram( shaderProgram.id );
+        setUniforms();
+        int vertexColorLocation = glGetUniformLocation( shaderProgram.id, "u_Color" );
         float time = ( float )glfwGetTime();
-        float colorValue = ( float )( ( Math.sin( time ) / 2.0f ) + 0.5f );
+        float colorValue = ( Math.sin( time ) / 2.0f ) + 0.5f;
         glUniform3f( vertexColorLocation, colorValue, colorValue, colorValue );
 
-        glActiveTexture( GL_TEXTURE0 );
-        glBindTexture( GL_TEXTURE_2D, texture.id );
-
-        glActiveTexture( GL_TEXTURE1 );
-        glBindTexture( GL_TEXTURE_2D, texture2.id );
+        for ( int i = 0; i < textures.size(); i++ ) {
+            glActiveTexture( GL_TEXTURE0 + i );
+            glBindTexture( GL_TEXTURE_2D, textures.get( i ).id );
+        }
 
         glBindVertexArray( VAO );
         glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );
