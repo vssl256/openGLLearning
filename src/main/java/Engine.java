@@ -1,13 +1,16 @@
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL33.*;
 
 public class Engine {
+
+    public static final float MOVEMENT_SPEED = 1f;
 
     private Window win;
     private Scene scene;
     private DebugUI debugUI;
     private Shader shaderProgram;
     private Render render;
+    private Transformation transformation;
 
     public Engine() {
         init();
@@ -17,7 +20,8 @@ public class Engine {
         win = new Window( 640, 640, "testWindow" );
         scene = new Scene();
         shaderProgram = new Shader( "test" );
-        render = new Render( scene, shaderProgram, win );
+        transformation = new Transformation( 70f, 1, 0.01f, 1000.0f );
+        render = new Render( scene, shaderProgram, win, transformation );
         debugUI = new DebugUI( win );
         Mesh mesh = new Mesh( new float[] {
                 0.5f,   0.5f,   -1.05f,      0.0f, 1.0f, 1.0f,   1.0f, 1.0f,
@@ -53,10 +57,12 @@ public class Engine {
         double lastTime = glfwGetTime();
         int frameCount = 0;
         double firstFrame;
-        double deltaTime;
+        double deltaTime = 0;
+
         while ( !glfwWindowShouldClose( win.id ) ) {
             firstFrame = glfwGetTime();
-            win.inputHandler();
+
+            inputHandler( deltaTime );
 
             render.render();
 
@@ -74,8 +80,21 @@ public class Engine {
                 lastTime = currentTime;
             }
             deltaTime = glfwGetTime() - firstFrame;
-            debugUI.deltaTime = deltaTime;
+            debugUI.deltaTime = Transformation.pitch;
         }
         glfwTerminate();
+    }
+
+    private void inputHandler( double dt ) {
+        if ( glfwGetKey( win.id, GLFW_KEY_A ) == GLFW_PRESS ) {
+            transformation.moveToward( Directions.LEFTWARD, dt );
+        } else if ( glfwGetKey( win.id, GLFW_KEY_D ) == GLFW_PRESS ) {
+            transformation.moveToward( Directions.RIGHTWARD, dt );
+        }
+        if ( glfwGetKey( win.id, GLFW_KEY_W ) == GLFW_PRESS ) {
+            transformation.moveToward( Directions.FORWARD, dt );
+        } else if ( glfwGetKey( win.id, GLFW_KEY_S ) == GLFW_PRESS ) {
+            transformation.moveToward( Directions.BACKWARD, dt );
+        }
     }
 }

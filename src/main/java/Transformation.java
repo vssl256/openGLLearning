@@ -4,7 +4,9 @@ import org.joml.Vector3f;
 
 public class Transformation {
 
-    public static Vector3f position;
+    private static final float MOVEMENT_SPEED = Engine.MOVEMENT_SPEED;
+
+    public Vector3f position;
     public static float yaw, pitch;
     private float fov;
     private float zNear, zFar;
@@ -13,6 +15,9 @@ public class Transformation {
     public Matrix4f projection;
     public Matrix4f view;
     private final Matrix4f modelViewMatrix;
+
+    private Matrix4f rotation;
+    private Vector3f directionVector;
 
     public Transformation( float fov, float aspect, float zNear, float zFar ) {
         this.fov = fov;
@@ -24,6 +29,24 @@ public class Transformation {
         view = new Matrix4f();
         projection = new Matrix4f().setPerspective( Math.toRadians( fov ), aspect, zNear, zFar );
         modelViewMatrix = new Matrix4f();
+
+        rotation = new Matrix4f();
+        directionVector = new Vector3f();
+    }
+    public void moveToward( Directions direction, double dt ) {
+
+        rotation.identity()
+                .rotateY( Math.toRadians( yaw ) );
+
+        switch ( direction ) {
+            case FORWARD -> rotation.positiveZ( directionVector ).negate();
+            case BACKWARD -> rotation.positiveZ( directionVector );
+            case RIGHTWARD -> rotation.positiveX( directionVector );
+            case LEFTWARD -> rotation.positiveX( directionVector ).negate();
+        }
+
+        directionVector.normalize();
+        position.add( directionVector.mul( MOVEMENT_SPEED * ( float ) dt ) );
     }
 
     public Matrix4f getMVPMatrix() {

@@ -7,16 +7,11 @@ public class Render {
     private Shader shaderProgram;
     private Window win;
 
-    public Render( Scene scene, Shader shaderProgram, Window win ) {
+    public Render( Scene scene, Shader shaderProgram, Window win, Transformation transformation ) {
         this.scene = scene;
         this.shaderProgram = shaderProgram;
         this.win = win;
-
-        init();
-    }
-
-    private void init() {
-        transformation = new Transformation( 70f, 1, 0.01f, 1000.0f );
+        this.transformation = transformation;
     }
 
     private void setMVPUniform() {

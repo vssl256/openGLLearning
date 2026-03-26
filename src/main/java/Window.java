@@ -81,7 +81,7 @@ public class Window {
 
         glfwSetInputMode( id, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
 
-        glfwSetFramebufferSizeCallback( id, ( _, width, height ) -> {
+        glfwSetFramebufferSizeCallback( id, ( _win, width, height ) -> {
             this.resized = true;
             glViewport( 0, 0, width, height );
             if ( !fullscreenMode ) {
@@ -93,14 +93,14 @@ public class Window {
         } );
 
         getPos();
-        glfwSetWindowPosCallback( id, ( _, x, y ) -> {
+        glfwSetWindowPosCallback( id, ( _win, x, y ) -> {
             if ( !fullscreenMode ) {
                 this.x = x;
                 this.y = y;
             }
         } );
 
-        glfwSetCursorPosCallback( id, ( _, mouseX, mouseY ) -> {
+        glfwSetCursorPosCallback( id, ( _win, mouseX, mouseY ) -> {
             if ( guiMode ) return;
             if ( firstFrame ) {
                 lastMouseX = mouseX;
@@ -122,7 +122,7 @@ public class Window {
             Transformation.pitch = Math.clamp( -89f, 89f, Transformation.pitch );
         } );
 
-        glfwSetKeyCallback( id, ( _, key, scancode, action, mods ) -> {
+        glfwSetKeyCallback( id, ( _win, key, _scancode, action, _mods ) -> {
             if ( action == GLFW_PRESS ) {
                 switch ( key ) {
                     case GLFW_KEY_ESCAPE -> glfwSetWindowShouldClose( id, true );
@@ -163,19 +163,6 @@ public class Window {
                 }
             }
         } );
-    }
-
-    public void inputHandler() {
-        if ( glfwGetKey( id, GLFW_KEY_A ) == GLFW_PRESS ) {
-            Transformation.position.x -= 0.01f;
-        } else if ( glfwGetKey( id, GLFW_KEY_D ) == GLFW_PRESS ) {
-            Transformation.position.x += 0.01f;
-        }
-        if ( glfwGetKey( id, GLFW_KEY_W ) == GLFW_PRESS ) {
-            Transformation.position.z -= 0.01f;
-        } else if ( glfwGetKey( id, GLFW_KEY_S ) == GLFW_PRESS ) {
-            Transformation.position.z += 0.01f;
-        }
     }
 
     private void getPos() {
