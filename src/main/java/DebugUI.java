@@ -36,7 +36,7 @@ public class DebugUI {
             showText = true;
         }
 
-        if ( !showText ) {
+        if ( showText ) {
             ImGui.text( currentFPS + " FPS" );
             ImGui.text( deltaTime + " DT" );
             ImGui.sameLine();

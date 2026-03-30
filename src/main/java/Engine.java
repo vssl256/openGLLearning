@@ -1,3 +1,10 @@
+import org.joml.Vector2d;
+import org.joml.Vector3f;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL33.*;
 
@@ -82,10 +89,39 @@ public class Engine {
             deltaTime = glfwGetTime() - firstFrame;
             debugUI.deltaTime = Transformation.pitch;
         }
+        glfwFreeCallbacks( win.id );
+        glfwDestroyWindow( win.id );
         glfwTerminate();
     }
 
+    private boolean w, a, s, d;
+    private Vector3f movementVector = new Vector3f();
     private void inputHandler( double dt ) {
+        w = isKeyPressed( 'w' );
+        a = isKeyPressed( 'a' );
+        s = isKeyPressed( 's' );
+        d = isKeyPressed( 'd' );
+
+
+        if ( w ) movementVector.set( 0.0f, 0.0f, -1.0f );
+        if ( a ) movementVector.set( -1.0f, 0.0f, 0.0f );
+        if ( s ) movementVector.set( 0.0f, 0.0f, 1.0f );
+        if ( d ) movementVector.set( 1.0f, 0.0f, 0.0f );
+
+        if ( w && a ) movementVector.set( -1.0f, 0.0f, -1.0f );
+        if ( a && s ) movementVector.set( -1.0f, 0.0f, 1.0f );
+        if ( s && d ) movementVector.set( 1.0f, 0.0f, 1.0f );
+        if ( w && d ) movementVector.set( 1.0f, 0.0f, -1.0f );
+
+        transformation.moveToward( movementVector, dt );
+    }
+
+    private boolean isKeyPressed( char key ) {
+        key = Character.toUpperCase( key );
+        return glfwGetKey( win.id, ( int ) key ) == GLFW_PRESS;
+    }
+
+    private void inputHandlerDepr( double dt ) {
         if ( glfwGetKey( win.id, GLFW_KEY_A ) == GLFW_PRESS ) {
             transformation.moveToward( Directions.LEFTWARD, dt );
         } else if ( glfwGetKey( win.id, GLFW_KEY_D ) == GLFW_PRESS ) {

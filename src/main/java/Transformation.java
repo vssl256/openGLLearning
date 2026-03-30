@@ -33,6 +33,7 @@ public class Transformation {
         rotation = new Matrix4f();
         directionVector = new Vector3f();
     }
+
     public void moveToward( Directions direction, double dt ) {
 
         rotation.identity()
@@ -47,6 +48,10 @@ public class Transformation {
 
         directionVector.normalize();
         position.add( directionVector.mul( MOVEMENT_SPEED * ( float ) dt ) );
+    }
+
+    public void moveToward( Vector3f vector, double dt ) {
+        position.add( vector.mul( MOVEMENT_SPEED * ( float ) dt ) );
     }
 
     public Matrix4f getMVPMatrix() {
