@@ -1,3 +1,0 @@
-public enum Directions {
-    FORWARD, BACKWARD, RIGHTWARD, LEFTWARD, UPWARD, DOWNWARD
-}

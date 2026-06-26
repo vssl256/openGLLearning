@@ -54,26 +54,6 @@ public class Mesh {
         }
     }
 
-    public static int width = 480;
-    public static int height = 480;
-    public static float rotX = 0f;
-    public static float rotY = 0f;
-    public static float xOffset = 0f;
-    public static float zOffset = 0f;
-    public void matrixTest() {
-        try ( MemoryStack stack = MemoryStack.stackPush() ) {
-
-            Matrix4f matrix = new Matrix4f()
-                    .setPerspective( Math.toRadians( 90f ),
-                            ( float ) width / height, 0.01f, 1000.0f )
-                    .rotateX( Math.toRadians( rotY ) )
-                    .rotateY( Math.toRadians( rotX ) )
-                    .translate( new Vector3f( xOffset, 0.0f, zOffset ).rotateY( Math.toRadians(rotX) ) );
-
-            glUniformMatrix4fv( glGetUniformLocation( shaderProgram.id, "projection" ), false, matrix.get( stack.mallocFloat( 16 ) ) );
-        }
-    }
-
     public void init() {
         VAO = glGenVertexArrays();
         glBindVertexArray( VAO );
@@ -99,23 +79,32 @@ public class Mesh {
     }
 
     public void draw() {
-        //glPolygonMode( GL_FRONT_AND_BACK, drawMode );
+        int[] values = new int[2];
+        glGetIntegerv( GL_POLYGON_MODE, values );
+        int currentMode = values[0];
 
-        shaderProgram.needToRecompile();
+        glPolygonMode( GL_FRONT_AND_BACK, drawMode );
 
-        glUseProgram( shaderProgram.id );
-        setUniforms();
-        int vertexColorLocation = glGetUniformLocation( shaderProgram.id, "u_Color" );
-        float time = ( float )glfwGetTime();
-        float colorValue = ( Math.sin( time ) / 2.0f ) + 0.5f;
-        glUniform3f( vertexColorLocation, colorValue, colorValue, colorValue );
+        //shaderProgram.needToRecompile();
 
-        for ( int i = 0; i < textures.size(); i++ ) {
-            glActiveTexture( GL_TEXTURE0 + i );
-            glBindTexture( GL_TEXTURE_2D, textures.get( i ).id );
-        }
+        //glUseProgram( shaderProgram.id );
+
+        //shaderProgram.createUniform( "u_Color" );
+        //shaderProgram.setUniform3f( "u_Color", new Vector3f( 2.0f, 2.0f, 2.0f ) );
+        //setUniforms();
+        //int vertexColorLocation = glGetUniformLocation( shaderProgram.id, "u_Color" );
+        //float time = ( float )glfwGetTime();
+        //float colorValue = ( Math.sin( time ) / 2.0f ) + 0.5f;
+        //wglUniform3f( vertexColorLocation, colorValue, colorValue, colorValue );
+
+        //for ( int i = 0; i < textures.size(); i++ ) {
+        //    glActiveTexture( GL_TEXTURE0 + i );
+        //    glBindTexture( GL_TEXTURE_2D, textures.get( i ).id );
+        //}
 
         glBindVertexArray( VAO );
         glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );
+
+        glPolygonMode( GL_FRONT_AND_BACK, currentMode );
     }
 }

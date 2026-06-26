@@ -1,4 +1,5 @@
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.lwjgl.system.MemoryStack;
 
 import java.io.File;
@@ -35,16 +36,37 @@ public class Shader {
     public void setUniform1i( String name, int integer ) {
         Integer uLocation = uniforms.get( name );
         if ( uLocation == null ) {
-            System.err.println( "Error during uniform setting " + name );
+            System.err.println( "Error during 1int uniform setting " + name );
             return;
         }
         glUniform1i( uLocation, integer );
     }
 
+    public void setUniform1f( String name, float value ) {
+        Integer uLocation = uniforms.get( name );
+        if ( uLocation == null ) {
+            System.err.println( "Error during 1int uniform setting " + name );
+            return;
+        }
+        glUniform1f( uLocation, value );
+    }
+
+    public void setUniform3f( String name, Vector3f vec3 ) {
+        Integer uLocation = uniforms.get( name );
+        if ( uLocation == null ) {
+            System.err.println( "Error during vec3 uniform setting " + name );
+            return;
+        }
+        try ( MemoryStack stack = MemoryStack.stackPush() ) {
+            FloatBuffer buffer = stack.mallocFloat( 3 );
+            glUniform3fv( uLocation, vec3.get( buffer ) );
+        }
+    }
+
     public void setUniformMatrix4f( String name, Matrix4f mat4 ) {
         Integer uLocation = uniforms.get( name );
         if ( uLocation == null ) {
-            System.err.println( "Error during uniform setting " + name );
+            System.err.println( "Error during mat4 uniform setting " + name );
             return;
         }
         try ( MemoryStack stack = MemoryStack.stackPush() ) {
@@ -109,6 +131,10 @@ public class Shader {
         }
         glUseProgram( id );
 
-        createUniform( "mvpMatrix" );
+        createUniform( "model" );
+        createUniform( "view" );
+        createUniform( "projection" );
+        createUniform( "lightPos" );
+        createUniform( "viewPos" );
     }
 }
