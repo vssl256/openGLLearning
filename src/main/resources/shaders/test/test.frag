@@ -10,8 +10,8 @@ in vec3 fragPos;
 
 uniform vec3 u_Color;
 uniform sampler2D bricks;
-float min = 25.0f;
-float max = -25.0f;
+float minV = 25.0f;
+float maxV = -25.0f;
 float ambientLight = 0.0;
 uniform vec3 lightPos;
 vec3 lightColor = vec3( 1.0f, 1.0f, 1.0f );
@@ -29,9 +29,9 @@ void main()
     //vec4 c2 = texture( bricks, TexCoord + u_Color.x * 0 );
     vec3 color = fragPos;
     vec2 blocks = floor(TexCoord * 16.0) / 16.0;
-    float r = ( color.x * color.x + min ) / ( max - min );
-    float g = ( color.y * color.y + min ) / ( max - min );
-    float b = ( color.z * color.z + min ) / ( max - min );
+    float r = ( color.x * color.x + minV ) / ( maxV - minV );
+    float g = ( color.y * color.y + minV ) / ( maxV - minV );
+    float b = ( color.z * color.z + minV ) / ( maxV - minV );
 
     vec3 norm = normalize( normal );
     vec3 lightDir = normalize( lightPos - fragPos );
